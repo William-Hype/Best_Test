@@ -1,0 +1,76 @@
+#pgzero
+import random
+
+WIDTH = 600
+HEIGHT = 400
+
+TITLE = "El nombre de su juego"
+FPS = 30
+
+
+char = Actor('ship1', (50, 240))
+background = Actor("space")
+score = 0
+
+enemies = []
+for i in range(5):
+    x = random.randint(20, 580)
+    y = random.randint(-450, -50)
+    enemy = Actor("meteor",(x, y))
+    enemy.speed = random.randint(2, 8)
+    enemies.append(enemy)
+
+def new_enemy():
+   x = random.randint(20, 580) 
+   y = -50
+   enemy = Actor("meteor",(x, y))
+   enemy.speed = random.randint(2, 8)
+   enemies.append(enemy)
+ 
+def enemy_meteor():
+    global score 
+    for enemy in enemies:
+        if enemy.y < 500:
+            enemy.y += enemy.speed
+        else:
+            enemies.remove(enemy)
+            new_enemy()
+            score += 1
+            
+def draw():
+    screen.clear()
+    background.draw()
+    char.draw()
+    for enemy in enemies:
+        enemy.draw()
+    screen.draw.text(score, center =(20, 20), fontsize=36, color="red")
+    if mode == "game_over":
+        background.draw()
+        screen.draw.text("GAME OVER", center =(WIDTH // 2, HEIGHT // 2), fontsize=64, color="red")
+        
+def on_mouse_move(pos):
+    char.pos = pos
+    
+def collisions():
+    global mode
+    for enemy in enemies:
+        if char.colliderect(enemy):
+            mode = "game_over"
+            
+            
+def update(dt):
+    if mode == "playing":
+        enemy_meteor()
+        collisions()
+    
+    if keyboard.left and char.x > 20: 
+        char.x -= 5 
+    elif keyboard.left and char.x < WIDTH - 20:
+        char.x += 5
+        
+    if keyboard.space:
+        char.y = 180     
+    animate(char, tween='bounce_end', duration=0.5, y=240)
+    
+    
+mode = "playing"
